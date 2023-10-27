@@ -25,7 +25,7 @@ app.post('/upload', (req, res) => {
     uploadedFile.mv(uploadPath, function(err) {
         if (err) return res.status(500).send(err);
 
-        exec(`pdf2htmlEX --embed cfijo ${uploadPath} ${convertedPath}`, (err, stdout, stderr) => {
+        exec(`pdf2htmlEX  ${uploadPath} ${convertedPath}`, (err, stdout, stderr) => {
             if (err) {
                 console.error(err);
                 return res.status(500).send('Error in conversion process.');
