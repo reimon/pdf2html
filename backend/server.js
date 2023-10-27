@@ -36,7 +36,7 @@ app.post('/upload', (req, res) => {
 
         console.log(`File saved. Starting conversion to HTML: ${convertedPath}`);
 
-        exec(`pdf2htmlEX --embed cfijo ${uploadPath} ${convertedPath}`, (err, stdout, stderr) => {
+        exec(`pdf2htmlEX  ${uploadPath} ${convertedPath}`, (err, stdout, stderr) => {
             if (err) {
                 console.error('Error in conversion process:', err);
                 return res.status(500).send('Error in conversion process.');
