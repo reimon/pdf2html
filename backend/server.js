@@ -14,23 +14,37 @@ const uploadsDir = path.join(__dirname, 'uploads');
 const convertedDir = path.join(__dirname, '..', 'frontend/converted');
 
 app.post('/upload', (req, res) => {
+    console.log('Receiving file...');
+
     if (!req.files || Object.keys(req.files).length === 0) {
+        console.log('No file uploaded.');
         return res.status(400).send('No files were uploaded.');
     }
 
     let uploadedFile = req.files.pdfFile;
-    let uploadPath = path.join(uploadsDir, uploadedFile.name);
-    let convertedPath = path.join(convertedDir, uploadedFile.name.replace('.pdf', '.html'));
+    let timestamp = new Date().getTime();
+    let uniqueFileName = `${timestamp}-${uploadedFile.name}`;
+    let uploadPath = path.join(uploadsDir, uniqueFileName);
+    let convertedFileName = uniqueFileName.replace('.pdf', '.html');
+    let convertedPath = path.join(convertedDir, convertedFileName);
+
+    console.log(`Uploading file: ${uniqueFileName}`);
 
     uploadedFile.mv(uploadPath, function(err) {
-        if (err) return res.status(500).send(err);
+        if (err) {
+            console.error('File upload failed:', err);
+            return res.status(500).send(err);
+        }
 
-        exec(`pdf2htmlEX  ${uploadPath} ${convertedPath}`, (err, stdout, stderr) => {
+        console.log(`File uploaded. Starting conversion: ${uniqueFileName}`);
+
+        exec(`pdf2htmlEX --embed cfijo ${uploadPath} ${convertedPath}`, (err, stdout, stderr) => {
             if (err) {
-                console.error(err);
+                console.error('Conversion failed:', err);
                 return res.status(500).send('Error in conversion process.');
             }
-            res.send({filePath: `converted/${uploadedFile.name.replace('.pdf', '.html')}`});
+            console.log(`Conversion successful: ${convertedFileName}`);
+            res.send({filePath: `converted/${convertedFileName}`});
         });
     });
 });
