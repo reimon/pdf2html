@@ -53,29 +53,26 @@ app.get('/convert', (req, res) => {
     let uploadedFilePath = req.query.file;
     let fileName = path.basename(uploadedFilePath, '.pdf');
     let uploadPath = path.join(uploadsDir, fileName + '.pdf');
-    let temporaryConvertedPath = path.join(uploadsDir, fileName + '.html');
-    let finalConvertedPath = path.join(convertedDir, fileName + '.html');
+    let convertedPath = path.join(fileName + '.html');
 
     console.log(`Iniciando conversão de ${uploadPath} para HTML`);
 
-    exec(`pdf2htmlEX --embed cfijo ${uploadPath}`, (err, stdout, stderr) => {
+    exec(`pdf2htmlEX --embed cfijo ${uploadPath} ${convertedPath}`, (err, stdout, stderr) => {
         if (err) {
             console.error('Erro no processo de conversão:', err);
             return res.status(500).send('Erro no processo de conversão.');
         }
+
         console.log('Conversão completa. Movendo o arquivo...');
 
-        fs.rename(temporaryConvertedPath, finalConvertedPath, (err) => {
-            if (err) {
-                console.error('Erro ao mover o arquivo:', err);
-                return res.status(500).send('Erro ao mover o arquivo.');
-            }
+        let finalConvertedPath = path.join(convertedDir, fileName + '.html');
+        fs.renameSync(convertedPath, finalConvertedPath);
 
-            console.log(`Arquivo movido para ${finalConvertedPath}`);
-            res.send({filePath: `converted/${fileName}.html`});
-        });
+        console.log(`Arquivo movido para ${finalConvertedPath}`);
+        res.send({filePath: `converted/${fileName}.html`});
     });
 });
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
