@@ -50,8 +50,6 @@ app.post('/upload', (req, res) => {
 
 // Endpoint para converter PDF em HTML
 app.get('/convert', (req, res) => {
-    console.log('iniciando a converção');
-    
     let uploadedFilePath = req.query.file;
     let fileName = path.basename(uploadedFilePath, '.pdf');
     let uploadPath = path.join(uploadsDir, fileName + '.pdf');
@@ -59,7 +57,7 @@ app.get('/convert', (req, res) => {
 
     console.log(`Iniciando conversão de ${uploadPath} para HTML`);
 
-    exec(`pdf2htmlEX  ${uploadPath} ${convertedPath}`, (err, stdout, stderr) => {
+    exec(`pdf2htmlEX ${uploadPath} ${convertedPath}`, (err, stdout, stderr) => {
         if (err) {
             console.error('Erro no processo de conversão:', err);
             return res.status(500).send('Erro no processo de conversão.');
